@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>livrosgratis</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 15px;
+      margin: 0;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 10px auto;
+      padding: 14px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      background-color: #4CAF50;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .voltar-btn {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 10px 15px;
+      font-size: 14px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .historia {
+      background: white;
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 25px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: left;
+    }
+
+    .imagem-audio {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    img {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 10px;
+      flex: 1;
+    }
+
+    .texto {
+      white-space: pre-wrap;
+      font-size: 16px;
+      color: #333;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    .reacoes {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .reacoes button {
+      padding: 8px 12px;
+      font-size: 14px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .contador {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="voltar-btn" onclick="voltarInicio()" style="display: none;">⬅ Voltar</button>
+
+  <h1 id="titulo">Escolha uma História</h1>
+  <div id="botoes">
+    <button onclick="mostrarHistoria('historia1')">🌲 O Mistério da Floresta</button>
+    <button onclick="mostrarHistoria('historia2')">⏳ A Máquina do Tempo</button>
+  </div>
+
+  <div id="exibicao" class="historia" style="display: none;"></div>
+
+  <script>
+    const historias = {
+      historia1: {
+        titulo: "O Mistério da Floresta",
+        imagem: "https://i.imgur.com/WeybLNy.jpeg",
+        audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        texto: `Em uma floresta densa e esquecida pelo tempo, sons estranhos ecoavam entre as árvores...
+Era noite e ninguém ousava entrar. Mas algo estava prestes a acontecer...`
+      },
+      historia2: {
+        titulo: "A Máquina do Tempo",
+        imagem: "https://i.imgur.com/w1XHtC6.jpg",
+        audio: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        texto: `Lucas descobriu uma máquina velha no porão do avô.
+Ao ligá-la, tudo mudou. Ele viu datas piscando e lugares desconhecidos surgindo na tela...`
+      }
+    };
+
+    let audioAtual = null;
+
+    function mostrarHistoria(id) {
+      const historia = historias[id];
+      if (!historia) return;
+
+      document.getElementById("titulo").style.display = "none";
+      document.getElementById("botoes").style.display = "none";
+      document.querySelector(".voltar-btn").style.display = "inline-block";
+
+      const gosteis = JSON.parse(localStorage.getItem("gostei_" + id)) || 0;
+      const naoGosteis = JSON.parse(localStorage.getItem("naogostei_" + id)) || 0;
+
+      const exibicao = document.getElementById("exibicao");
+      exibicao.style.display = "block";
+      exibicao.innerHTML = `
+        <h2>${historia.titulo}</h2>
+        <div class="imagem-audio">
+          <img src="${historia.imagem}" alt="Imagem da história">
+          <button onclick="tocarAudio('${historia.audio}')">🔊 Tocar Áudio</button>
+        </div>
+        <div class="texto">${historia.texto}</div>
+
+        <div class="reacoes">
+          <button onclick="registrarReacao('${id}', 'gostei')">👍 Eu gostei (<span id="gostei-count">${gosteis}</span>)</button>
+          <button onclick="registrarReacao('${id}', 'naogostei')">👎 Não gostei (<span id="naogostei-count">${naoGosteis}</span>)</button>
+        </div>
+      `;
+
+      exibicao.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function tocarAudio(url) {
+      if (audioAtual) {
+        audioAtual.pause();
+        audioAtual = null;
+      }
+      audioAtual = new Audio(url);
+      audioAtual.play();
+    }
+
+    function voltarInicio() {
+      document.getElementById("exibicao").style.display = "none";
+      document.getElementById("titulo").style.display = "block";
+      document.getElementById("botoes").style.display = "block";
+      document.querySelector(".voltar-btn").style.display = "none";
+
+      if (audioAtual) {
+        audioAtual.pause();
+        audioAtual = null;
+      }
+    }
+
+    function registrarReacao(historiaId, tipo) {
+  const chaveVoto = "votou_" + historiaId;
+  if (localStorage.getItem(chaveVoto)) {
+    alert("Você já votou nessa história.");
+    return;
+  }
+
+  const chave = tipo === "gostei" ? "gostei_" + historiaId : "naogostei_" + historiaId;
+  let atual = JSON.parse(localStorage.getItem(chave)) || 0;
+  atual++;
+  localStorage.setItem(chave, JSON.stringify(atual));
+  localStorage.setItem(chaveVoto, true); // marca que já votou
+
+  document.getElementById(tipo + "-count").textContent = atual;
+}
+  </script>
+
+</body>
+</html>

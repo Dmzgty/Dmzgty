@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro</title>
+  <style>
+    body {
+      background: #00000;
+      color: darkpink;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    form {
+      background: #1e091e;
+      padding: 45px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 370px;
+      box-shadow: 0 0 1px rgba(255,255,255,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #400049;
+    }
+  </style>
+</head>
+<body>
+
+  <form action="https://formsubmit.co/akarasgka0409@gmail.com" method="POST">
+    <h2>Cadastre-se na LPJA pra fazer parte da equipe</h2>
+    <input type="text" name="nome" placeholder="Seu nome" required>
+    <input type="text" name="estado" placeholder="Seu estado" required>
+    <input type="text" name="idade" placeholder="Sua idade" required>
+    <input type="text" name="email" placeholder="Seu email" required>
+    <input type="text" name="qual seu talento" placeholder="escritor (a), desenhista, critico..." required>
+    <textarea name="sobre você" placeholder="Escreva algo sobre você..." rows="4"></textarea>
+    
+    <!-- Evita spam e mostra mensagem personalizada -->
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_next" value="obrigado.html">
+
+    <button type="submit">Enviar</button>
+  </form>
+
+</body>
+</html>
