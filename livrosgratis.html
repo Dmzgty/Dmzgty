@@ -1,9 +1,29 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>livrosgratis</title>
+
+  <!-- Firebase SDK para Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCwqW6lUfLVGRO***REDACTED***",
+      authDomain: "site-41929.firebaseapp.com",
+      databaseURL: "https://site-41929-default-rtdb.firebaseio.com",
+      projectId: "site-41929",
+      storageBucket: "site-41929.appspot.com",
+      messagingSenderId: "937635259287",
+      appId: "1:937635259287:web:b7dbdbfd82***REDACTED***"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -92,6 +112,9 @@
       background-color: #007BFF;
       padding: 10px;
       font-size: 15px;
+      color: white;
+      border: none;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -148,9 +171,11 @@ Ao ligá-la, tudo mudou. Ele viu datas piscando e lugares desconhecidos surgindo
       const texto = input.value.trim();
       if (texto === "") return;
 
-      let comentarios = JSON.parse(localStorage.getItem("comentarios_" + historiaId)) || [];
-      comentarios.push(texto);
-      localStorage.setItem("comentarios_" + historiaId, JSON.stringify(comentarios));
+      const comentarioRef = db.ref("comentarios/" + historiaId).push();
+      comentarioRef.set({
+        texto: texto,
+        timestamp: Date.now()
+      });
 
       input.value = "";
       carregarComentarios(historiaId);
@@ -158,14 +183,22 @@ Ao ligá-la, tudo mudou. Ele viu datas piscando e lugares desconhecidos surgindo
 
     function carregarComentarios(historiaId) {
       const lista = document.getElementById("lista-comentarios");
-      const comentarios = JSON.parse(localStorage.getItem("comentarios_" + historiaId)) || [];
+      lista.innerHTML = "Carregando comentários...";
 
-      lista.innerHTML = "";
-      comentarios.forEach(c => {
-        const div = document.createElement("div");
-        div.className = "comentario";
-        div.textContent = c;
-        lista.appendChild(div);
+      db.ref("comentarios/" + historiaId).once("value", snapshot => {
+        lista.innerHTML = "";
+        const dados = snapshot.val();
+        if (dados) {
+          const comentarios = Object.values(dados).sort((a, b) => a.timestamp - b.timestamp);
+          comentarios.forEach(c => {
+            const div = document.createElement("div");
+            div.className = "comentario";
+            div.textContent = c.texto;
+            lista.appendChild(div);
+          });
+        } else {
+          lista.innerHTML = "<i>Seja o primeiro a comentar!</i>";
+        }
       });
     }
   </script>
